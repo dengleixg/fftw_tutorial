@@ -2,18 +2,18 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <complex.h>
 #include <fftw3.h>
+#include <complex.h>
 
 #include "util.h"
 
 int test_1d_c2c(int n) {
 
     int dir = FFTW_BACKWARD;
-    double real, imag, phi;
+    double _real, _imag, phi;
 
-    fftw_complex *in = fftw_alloc_complex(n);
-    fftw_complex *ref_out = fftw_alloc_complex(n);
+    _Dcomplex*in = fftw_alloc_complex(n);
+    _Dcomplex* ref_out = fftw_alloc_complex(n);
     fftw_complex *fftw_out = fftw_alloc_complex(n);
 
     fftw_plan p = fftw_plan_dft_1d(n, in, fftw_out, dir, FFTW_ESTIMATE);
@@ -23,13 +23,15 @@ int test_1d_c2c(int n) {
 
     // compute the reference output
     for (int k = 0; k < n; ++k) {
-        ref_out[k] = 0.0;
+        ref_out[k] = _Cbuild(0.0, 0.0);
         for (int j = 0; j < n; ++j) {
             phi = dir * 2.0 * M_PI * j * k / ((double) n);
 
-            real = creal(in[j]) * cos(phi) - cimag(in[j]) * sin(phi);
-            imag = creal(in[j]) * sin(phi) + cimag(in[j]) * cos(phi);
-            ref_out[k] += real + I * imag;
+            _real = creal(in[j]) * cos(phi) - cimag(in[j]) * sin(phi);
+            _real += creal(ref_out[k]);
+            _imag = creal(in[j]) * sin(phi) + cimag(in[j]) * cos(phi);
+            _imag += cimag(ref_out[k]);
+            ref_out[k] =  _Cbuild(_real , _imag);
         }
     }
 

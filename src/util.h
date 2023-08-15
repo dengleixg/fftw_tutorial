@@ -1,19 +1,18 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <iostream>
-#include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
-#include <complex>
 #include <fftw3.h>
+#include <complex.h>
 
 #define M_PI      3.14159265358979323846   // pi
-//Macros for real and imaginary parts
+//Macros for creal and imaginary parts
 #define REAL 0
 #define IMAG 1
-
-using namespace std;
 
 void fill_zero_1d_real(int n, double *arr) {
     for (int i = 0; i < n; ++i) {
@@ -50,12 +49,12 @@ void fill_random_1d_real(int n, double *arr) {
 }
 
 void fill_random_1d_cplx(int n, fftw_complex *arr) {
-    double real, imag;
+    double creal, cimag;
     for (int i = 0; i < n; ++i) {
-        real = rand() / ((double) RAND_MAX);
-        imag = rand() / ((double) RAND_MAX);
-        arr[i][REAL] = real;
-        arr[i][IMAG] = imag;
+        creal = rand() / ((double) RAND_MAX);
+        cimag = rand() / ((double) RAND_MAX);
+        arr[i][REAL] = creal;
+        arr[i][IMAG] = cimag;
     }
 }
 
@@ -68,13 +67,13 @@ void fill_random_2d_real(int rows, int cols, double *arr) {
 }
 
 void fill_random_2d_cplx(int rows, int cols, fftw_complex *arr) {
-    double real, imag;
+    double creal, cimag;
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
-            real = rand() / ((double) RAND_MAX);
-            imag = rand() / ((double) RAND_MAX);
-            arr[i * cols + j][REAL] = real;
-            arr[i * cols + j][IMAG] = imag;
+            creal = rand() / ((double) RAND_MAX);
+            cimag = rand() / ((double) RAND_MAX);
+            arr[i * cols + j][REAL] = creal;
+            arr[i * cols + j][IMAG] = cimag;
         }
     }
 }
@@ -89,9 +88,9 @@ int compare_1d_real(int n, double *ref, double *arr, double eps) {
         delta = arr[i] - ref[i];
 
         if (fabs(delta) < eps) {
-            printf("  real ok (delta = %g)\n", delta);
+            printf("  creal ok (delta = %g)\n", delta);
         } else {
-            printf("  real: expected %g, got %g (delta = %g)\n", ref[i], arr[i],
+            printf("  creal: expected %g, got %g (delta = %g)\n", ref[i], arr[i],
                     delta);
             status = 1;
         }
@@ -106,29 +105,29 @@ int compare_1d_real(int n, double *ref, double *arr, double eps) {
     return status;
 }
 
-int compare_1d_cplx(int n, complex<double>* ref, complex<double>* arr, double eps) {
+int compare_1d_cplx(int n, _Dcomplex* ref, _Dcomplex* arr, double eps) {
     int status = 0;
     double delta_real, delta_imag;
 
     for (int i = 0; i < n; ++i) {
         printf("compare %d (len = %d)\n", i, n);
 
-        delta_real = real(arr[i]) - real(ref[i]);
-        delta_imag = imag(arr[i]) - imag(ref[i]);
+        delta_real = creal(arr[i]) - creal(ref[i]);
+        delta_imag = cimag(arr[i]) - cimag(ref[i]);
 
         if (fabs(delta_real) < eps) {
-            printf("  real ok (delta = %g)\n", delta_real);
+            printf("  creal ok (delta = %g)\n", delta_real);
         } else {
-            printf("  real: expected %g, got %g (delta = %g)\n", real(ref[i]),
-                    real(arr[i]), delta_real);
+            printf("  creal: expected %g, got %g (delta = %g)\n", creal(ref[i]),
+                    creal(arr[i]), delta_real);
             status = 1;
         }
 
         if (fabs(delta_imag) < eps) {
-            printf("  imag ok (delta = %g)\n", delta_imag);
+            printf("  cimag ok (delta = %g)\n", delta_imag);
         } else {
-            printf("  imag: expected %g, got %g (delta = %g)\n", imag(ref[i]),
-                    imag(arr[i]), delta_imag);
+            printf("  cimag: expected %g, got %g (delta = %g)\n", cimag(ref[i]),
+                    cimag(arr[i]), delta_imag);
             status = 1;
         }
     }
@@ -155,9 +154,9 @@ int compare_2d_real(int rows, int cols, double *ref, double *arr, double eps) {
             delta = arr[index] - ref[index];
 
             if (fabs(delta) < eps) {
-                printf("  real ok (delta = %g)\n", delta);
+                printf("  creal ok (delta = %g)\n", delta);
             } else {
-                printf("  real: expected %g, got %g (delta = %g)\n", ref[index],
+                printf("  creal: expected %g, got %g (delta = %g)\n", ref[index],
                         arr[index], delta);
                 status = 1;
             }
@@ -173,7 +172,7 @@ int compare_2d_real(int rows, int cols, double *ref, double *arr, double eps) {
     return status;
 }
 
-int compare_2d_cplx(int rows, int cols, complex<double>* ref, complex<double>* arr,
+int compare_2d_cplx(int rows, int cols, _Dcomplex* ref, _Dcomplex* arr,
         double eps) {
     int status = 0, index;
     double delta_real, delta_imag;
@@ -184,22 +183,22 @@ int compare_2d_cplx(int rows, int cols, complex<double>* ref, complex<double>* a
 
             index = i * cols + j;
 
-            delta_real = real(arr[index]) - real(ref[index]);
-            delta_imag = imag(arr[index]) - imag(ref[index]);
+            delta_real = creal(arr[index]) - creal(ref[index]);
+            delta_imag = cimag(arr[index]) - cimag(ref[index]);
 
             if (fabs(delta_real) < eps) {
-                printf("  real ok (delta = %g)\n", delta_real);
+                printf("  creal ok (delta = %g)\n", delta_real);
             } else {
-                printf("  real: expected %g, got %g (delta = %g)\n",
-                        real(ref[index]), real(arr[index]), delta_real);
+                printf("  creal: expected %g, got %g (delta = %g)\n",
+                        creal(ref[index]), creal(arr[index]), delta_real);
                 status = 1;
             }
 
             if (fabs(delta_imag) < eps) {
-                printf("  imag ok (delta = %g)\n", delta_imag);
+                printf("  cimag ok (delta = %g)\n", delta_imag);
             } else {
-                printf("  imag: expected %g, got %g (delta = %g)\n",
-                        imag(ref[index]), imag(arr[index]), delta_imag);
+                printf("  cimag: expected %g, got %g (delta = %g)\n",
+                        cimag(ref[index]), cimag(arr[index]), delta_imag);
                 status = 1;
             }
         }
@@ -218,13 +217,17 @@ int compare_2d_cplx(int rows, int cols, complex<double>* ref, complex<double>* a
 // formula from https://en.wikipedia.org/wiki/Discrete_Fourier_transform#Generalized_DFT_(shifted_and_non-linear_phase) (accessed 2021-03-23)
 // a: shift of input
 // b: shift of output
-void dft_1d_cplx(int n, complex<double>* in, complex<double>* out, double a, double b) {
-    complex<double> phi;
+void dft_1d_cplx(int n, _Dcomplex* in, _Dcomplex* out, double a, double b) {
+    double phi;
+    _Dcomplex ii = _Cbuild(0.0, 1.0);
     for (int k = 0; k < n; ++k) {
-        out[k] = 0.0;
+        out[k] = _Cbuild(0.0, 0.0);
         for (int j = 0; j < n; ++j) {
-            phi = -2.0i * M_PI * (k + b) * (j + a) / ((double)n);
-            out[k] += in[j] * exp(phi);
+            phi = -2.0 * M_PI * (k + b) * (j + a) / ((double)n);
+            _Dcomplex tmp = _Cmulcc(in[j], cexp(_Cmulcr(ii, phi)));
+            double _real = creal(out[k]) + creal(tmp);
+            double _imag = cimag(out[k]) + cimag(tmp);
+            out[k] = _Cbuild(_real, _imag);
         }
     }
 }
